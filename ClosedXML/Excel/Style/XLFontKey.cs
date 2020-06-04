@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 
 namespace ClosedXML.Excel
 {
@@ -25,6 +26,7 @@ namespace ClosedXML.Excel
         public XLFontFamilyNumberingValues FontFamilyNumbering { get; set; }
 
         public XLFontCharSet FontCharSet { get; set; }
+        public FontSchemeValues FontSchemeVal { get; internal set; }
 
         public bool Equals(XLFontKey other)
         {
@@ -39,6 +41,7 @@ namespace ClosedXML.Excel
              && FontColor == other.FontColor
              && FontFamilyNumbering == other.FontFamilyNumbering
              && FontCharSet == other.FontCharSet
+             && FontSchemeVal == other.FontSchemeVal
              && string.Equals(FontName, other.FontName, StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -63,6 +66,8 @@ namespace ClosedXML.Excel
             hashCode = hashCode * -1521134295 + StringComparer.InvariantCultureIgnoreCase.GetHashCode(FontName);
             hashCode = hashCode * -1521134295 + FontFamilyNumbering.GetHashCode();
             hashCode = hashCode * -1521134295 + FontCharSet.GetHashCode();
+            hashCode = hashCode * -1521134295 + (int)FontCharSet;
+            hashCode = hashCode * -1521134295 + (int)FontSchemeVal;
             return hashCode;
         }
 

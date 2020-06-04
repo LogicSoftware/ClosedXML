@@ -1,4 +1,6 @@
 ﻿using ClosedXML.Excel.Caching;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
 
 namespace ClosedXML.Excel
@@ -49,6 +51,8 @@ namespace ClosedXML.Excel
         public XLFontFamilyNumberingValues FontFamilyNumbering { get { return Key.FontFamilyNumbering; } }
 
         public XLFontCharSet FontCharSet { get { return Key.FontCharSet; } }
+
+        public FontSchemeValues FontSchemeVal { get { return Key.FontSchemeVal; } }
 
         private XLFontValue(XLFontKey key)
         {

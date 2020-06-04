@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using ClosedXML.Excel.Style;
 using Ap = DocumentFormat.OpenXml.ExtendedProperties;
 using Op = DocumentFormat.OpenXml.CustomProperties;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
@@ -26,6 +27,8 @@ namespace ClosedXML.Excel
     public partial class XLWorkbook
     {
         private readonly Dictionary<String, Color> _colorList = new Dictionary<string, Color>();
+
+        private List<XLNamedStyle> _namedStyles = new List<XLNamedStyle>();
 
         private void Load(String file)
         {
@@ -87,6 +90,11 @@ namespace ClosedXML.Excel
             ShapeIdManager = new XLIdManager();
             SetProperties(dSpreadsheet);
 
+            if (dSpreadsheet.WorkbookPart.ThemePart != null)
+            {
+                InitializeThemeFromThemePart(dSpreadsheet.WorkbookPart.ThemePart);
+                InitializeFontSchemeFromFontPart(dSpreadsheet.WorkbookPart.ThemePart.Theme?.ThemeElements.FontScheme);
+            }
             SharedStringItem[] sharedStrings = null;
             if (dSpreadsheet.WorkbookPart.GetPartsOfType<SharedStringTablePart>().Any())
             {
@@ -195,6 +203,12 @@ namespace ClosedXML.Excel
                 differentialFormats = s.DifferentialFormats.Elements<DifferentialFormat>().ToDictionary(k => dfCount++);
             else
                 differentialFormats = new Dictionary<Int32, DifferentialFormat>();
+
+            InitNamedStyles(s, fills, borders, fonts, numberingFormats);
+
+            var normalStyle = _namedStyles.FirstOrDefault(ns => ns.BuiltIn == 0);
+            if(normalStyle != null)
+                this.Style = new XLStyle(null, normalStyle.StyleKey);
 
             var sheets = dSpreadsheet.WorkbookPart.Workbook.Sheets;
             Int32 position = 0;
@@ -871,6 +885,28 @@ namespace ClosedXML.Excel
             }
 
             #endregion Pivot tables
+        }
+
+        private void InitNamedStyles(Stylesheet stylesheet, Fills fills, Borders borders,
+            Fonts fonts, NumberingFormats numberingFormats)
+        {
+            if (stylesheet?.CellStyles == null || stylesheet?.CellStyleFormats == null)
+                return;
+
+            _namedStyles = new List<XLNamedStyle>();
+
+            foreach (var cellStyle in stylesheet.CellStyles.Elements<CellStyle>())
+            {
+                var cellStyleFormat = (CellFormat)stylesheet.CellStyleFormats.ElementAt(Convert.ToInt32((uint) cellStyle.FormatId));
+
+                GenerateStyleKey(cellStyleFormat, fills, borders, fonts, numberingFormats, out var styleKey);
+
+                _namedStyles.Add(new XLNamedStyle(styleKey)
+                {
+                    Name =  cellStyle.Name,
+                    BuiltIn = (cellStyle.BuiltinId != null ? (int?)Convert.ToInt32((uint)cellStyle.BuiltinId) : null)
+                });
+            }
         }
 
         private void LoadPivotStyleFormats(XLPivotTable pt, PivotTableDefinition ptd, PivotCacheDefinition pcd, Dictionary<Int32, DifferentialFormat> differentialFormats)
@@ -3026,11 +3062,34 @@ namespace ClosedXML.Excel
         private void ApplyStyle(IXLStylized xlStylized, Int32 styleIndex, Stylesheet s, Fills fills, Borders borders,
                                 Fonts fonts, NumberingFormats numberingFormats)
         {
-            if (s == null) return; //No Stylesheet, no Styles
+            if (GenerateStyleKey(styleIndex, s, fills, borders, fonts, numberingFormats, out var xlStyle))
+                return; //No Stylesheet, no Styles
 
-            var cellFormat = (CellFormat)s.CellFormats.ElementAt(styleIndex);
+            //When loading columns we must propagate style to each column but not deeper. In other cases we do not propagate at all.
+            if (xlStylized is IXLColumns columns)
+                columns.Cast<XLColumn>().ForEach(col => col.InnerStyle = new XLStyle(col, xlStyle));
+            else
+                xlStylized.InnerStyle = new XLStyle(xlStylized, xlStyle);
+        }
 
-            var xlStyle = XLStyle.Default.Key;
+        private bool GenerateStyleKey(int styleIndex, Stylesheet s, Fills fills, Borders borders, Fonts fonts,
+            NumberingFormats numberingFormats, out XLStyleKey xlStyle)
+        {
+            xlStyle = new XLStyleKey();
+
+            if (s == null)
+                return true;
+
+            var cellFormat = (CellFormat) s.CellFormats.ElementAt(styleIndex);
+
+            return GenerateStyleKey(cellFormat, fills, borders, fonts, numberingFormats, out xlStyle);
+        }
+
+        private bool GenerateStyleKey(CellFormat cellFormat, Fills fills, Borders borders, Fonts fonts,
+            NumberingFormats numberingFormats,
+            out XLStyleKey xlStyle)
+        {
+            xlStyle = XLStyle.Default.Key;
 
             xlStyle.IncludeQuotePrefix = OpenXmlHelper.GetBooleanValueAsBool(cellFormat.QuotePrefix, false);
 
@@ -3055,11 +3114,13 @@ namespace ClosedXML.Excel
             if (UInt32HasValue(cellFormat.FillId))
             {
                 var fill = (Fill)fills.ElementAt((Int32)cellFormat.FillId.Value);
+                var xlFill = new XLFill(null);
                 if (fill.PatternFill != null)
                 {
-                    LoadFill(fill, xlStylized.InnerStyle.Fill, differentialFillFormat: false);
+                    LoadFill(fill, xlFill /*xlStylized.InnerStyle.Fill*/, differentialFillFormat: false);
                 }
-                xlStyle.Fill = (xlStylized.InnerStyle as XLStyle).Value.Key.Fill;
+
+                xlStyle.Fill = xlFill.Key; //(xlStylized.InnerStyle as XLStyle).Value.Key.Fill;
             }
 
             var alignment = cellFormat.Alignment;
@@ -3164,13 +3225,15 @@ namespace ClosedXML.Excel
                     if (font.FontFamilyNumbering != null && (font.FontFamilyNumbering).Val != null)
                     {
                         xlFont.FontFamilyNumbering =
-                            (XLFontFamilyNumberingValues)Int32.Parse((font.FontFamilyNumbering).Val.ToString());
+                            (XLFontFamilyNumberingValues) Int32.Parse((font.FontFamilyNumbering).Val.ToString());
                     }
+
                     if (font.FontName != null)
                     {
                         if ((font.FontName).Val != null)
                             xlFont.FontName = (font.FontName).Val;
                     }
+
                     if (font.FontSize != null)
                     {
                         if ((font.FontSize).Val != null)
@@ -3184,15 +3247,20 @@ namespace ClosedXML.Excel
                     if (font.Underline != null)
                     {
                         xlFont.Underline = font.Underline.Val != null
-                                            ? (font.Underline).Val.Value.ToClosedXml()
-                                            : XLFontUnderlineValues.Single;
+                            ? (font.Underline).Val.Value.ToClosedXml()
+                            : XLFontUnderlineValues.Single;
                     }
 
                     if (font.VerticalTextAlignment != null)
                     {
                         xlFont.VerticalAlignment = font.VerticalTextAlignment.Val != null
-                                                    ? (font.VerticalTextAlignment).Val.Value.ToClosedXml()
-                                                    : XLFontVerticalTextAlignmentValues.Baseline;
+                            ? (font.VerticalTextAlignment).Val.Value.ToClosedXml()
+                            : XLFontVerticalTextAlignmentValues.Baseline;
+                    }
+
+                    if (font.FontScheme != null)
+                    {
+                        xlFont.FontSchemeVal = font.FontScheme.Val;
                     }
 
                     xlStyle.Font = xlFont;
@@ -3227,11 +3295,7 @@ namespace ClosedXML.Excel
                 xlStyle.NumberFormat = xlNumberFormat;
             }
 
-            //When loading columns we must propagate style to each column but not deeper. In other cases we do not propagate at all.
-            if (xlStylized is IXLColumns columns)
-                columns.Cast<XLColumn>().ForEach(col => col.InnerStyle = new XLStyle(col, xlStyle));
-            else
-                xlStylized.InnerStyle = new XLStyle(xlStylized, xlStyle);
+            return false;
         }
 
         private static Boolean UInt32HasValue(UInt32Value value)

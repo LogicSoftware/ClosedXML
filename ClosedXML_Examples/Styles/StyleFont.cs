@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using System;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ClosedXML_Examples.Styles
 {
@@ -44,6 +45,12 @@ namespace ClosedXML_Examples.Styles
 
             ws.Cell(++ro, co).Value = "VerticalAlignment - Superscript";
             ws.Cell(ro, co).Style.Font.VerticalAlignment = XLFontVerticalTextAlignmentValues.Superscript;
+
+            ws.Cell(++ro, co).Value = "Minor";
+            ws.Cell(ro, co).Style.Font.FontSchemeVal = FontSchemeValues.Minor;
+
+            ws.Cell(++ro, co).Value = "Major";
+            ws.Cell(ro, co).Style.Font.FontSchemeVal = FontSchemeValues.Major;
 
             ws.Column(co).AdjustToContents();
 

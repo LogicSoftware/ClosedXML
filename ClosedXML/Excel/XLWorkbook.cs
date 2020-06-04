@@ -7,6 +7,9 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Packaging;
+using Path = System.IO.Path;
 
 namespace ClosedXML.Excel
 {
@@ -167,6 +170,11 @@ namespace ClosedXML.Excel
         public IXLTheme Theme { get; private set; }
 
         /// <summary>
+        ///   Gets an object to manipulate this workbook's theme.
+        /// </summary>
+        public XLFontScheme FontScheme { get; private set; }
+
+        /// <summary>
         ///   Gets or sets the default style for the workbook.
         ///   <para>All new worksheets will use this style.</para>
         /// </summary>
@@ -286,6 +294,23 @@ namespace ClosedXML.Excel
                 Hyperlink = XLColor.FromHtml("#FF0000FF"),
                 FollowedHyperlink = XLColor.FromHtml("#FF800080")
             };
+        }
+        
+        private void InitializeThemeFromThemePart(ThemePart themePart)
+        {
+            Theme = new XLTheme(themePart);
+        }
+
+        private void InitializeFontSchemeFromFontPart(FontScheme fontScheme)
+        {
+            FontScheme = new XLFontScheme(fontScheme);
+        }
+
+        public IXLStyle FromName(IXLCell container,  string name)
+        {
+            var key = _namedStyles?.FirstOrDefault(ns => ns.Name == name);
+
+            return key == null || !(container is IXLStylized) ? null : new XLStyle((IXLStylized) container, key.StyleKey);
         }
 
         public IXLNamedRange NamedRange(String rangeName)

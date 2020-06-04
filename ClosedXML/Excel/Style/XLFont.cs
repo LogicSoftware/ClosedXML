@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ClosedXML.Excel
 {
@@ -47,7 +48,8 @@ namespace ClosedXML.Excel
                     FontColor = defaultFont.FontColor.Key,
                     FontName = defaultFont.FontName,
                     FontFamilyNumbering = defaultFont.FontFamilyNumbering,
-                    FontCharSet = defaultFont.FontCharSet
+                    FontCharSet = defaultFont.FontCharSet,
+                    FontSchemeVal = defaultFont.FontSchemeVal
                 };
             }
         }
@@ -202,6 +204,14 @@ namespace ClosedXML.Excel
             }
         }
 
+        public FontSchemeValues FontSchemeVal
+        {
+            get { return Key.FontSchemeVal; }
+            set
+            {
+                Modify(k => { k.FontSchemeVal = value; return k; });
+            }
+        }
         public IXLStyle SetBold()
         {
             Bold = true;

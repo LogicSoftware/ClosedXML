@@ -4637,6 +4637,8 @@ namespace ClosedXML.Excel
                 nf.FontName = f.FontName.Val;
             if (f.FontFamilyNumbering != null)
                 nf.FontFamilyNumbering = (XLFontFamilyNumberingValues)f.FontFamilyNumbering.Val.Value;
+            if (f.FontScheme != null)
+                nf.FontSchemeVal = f.FontScheme.Val;
 
             return nf.Equals(xlFont.Key);
         }

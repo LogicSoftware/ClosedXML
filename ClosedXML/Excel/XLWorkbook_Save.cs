@@ -4087,8 +4087,14 @@ namespace ClosedXML.Excel
             var cellStyleFormatIndex = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>()
                 .TakeWhile(cellFormat => !CellFormatsAreEqual(cellFormat, info, compareAlignment: false)).Count();
 
-            if (cellStylesCount == cellStyleFormatIndex)
+            var namedStyleExcel = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>()
+                .FirstOrDefault(cellStyle => namedStyle.Name == cellStyle.Name);
+
+            if (cellStylesCount == cellStyleFormatIndex ||
+                workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().Any(cellStyle => cellStyle != namedStyleExcel && cellStyle?.FormatId != null && cellStyle.FormatId == cellStyleFormatIndex))
             {
+                cellStyleFormatIndex = cellStylesCount;
+
                 var cellStyleFormat = GetCellFormat(info);
 
                 if (cellStyleFormat.ApplyProtection.Value)
@@ -4098,10 +4104,7 @@ namespace ClosedXML.Excel
 
                 isCellStyleFormatAdded = true;
             }
-
-            var namedStyleExcel = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>()
-                .FirstOrDefault(cellStyle => namedStyle.Name == cellStyle.Name);
-
+            
             if (namedStyleExcel == null)
             {
                 namedStyleExcel = new CellStyle()

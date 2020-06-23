@@ -4037,17 +4037,11 @@ namespace ClosedXML.Excel
                     workbookStylesPart.Stylesheet.CellStyles.AppendChild(new CellStyle { Name = "Normal", FormatId = defaultFormatId, BuiltinId = 0U });
             }
 
-        //    var cellStyleFormatId = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().Any() ?
-        //        workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().Max(cellFormat => cellFormat.FormatId.Value) + 1 : 0;//defaultFormatId;
-
             if (_namedStyles?.Any() ?? false)
             {
                  foreach (var namedStyle in this._namedStyles.Where(ns => ns.BuiltIn != 0))
                  {
-                    // if(
-                    AddNamedCellStyleAndFormat(workbookStylesPart, namedStyleInfos, namedStyle /*, cellStyleFormatId*/);
-                    //      )
-                    // cellStyleFormatId++;
+                    AddNamedCellStyleAndFormat(workbookStylesPart, namedStyleInfos, namedStyle);
                  }
             }
 
@@ -4063,13 +4057,11 @@ namespace ClosedXML.Excel
                 if (foundOne) continue;
 
                 var cellStyleFormat = GetCellFormat(styleInfo);
-             //   cellStyleFormat.FormatId = cellStyleFormatId;
 
                 if (cellStyleFormat.ApplyProtection.Value)
                     cellStyleFormat.AppendChild(GetProtection(styleInfo));
 
                 workbookStylesPart.Stylesheet.CellStyleFormats.AppendChild(cellStyleFormat);
-             //   cellStyleFormatId++;
             }
 
             workbookStylesPart.Stylesheet.CellStyleFormats.Count =
@@ -4077,7 +4069,7 @@ namespace ClosedXML.Excel
         }
 
         private static bool AddNamedCellStyleAndFormat(WorkbookStylesPart workbookStylesPart, Dictionary<string, StyleInfo> namedStyleInfos,
-            XLNamedStyle namedStyle/*, uint cellStyleFormatId*/)
+            XLNamedStyle namedStyle)
         {
             var info = namedStyleInfos[namedStyle.Name];
 
@@ -4153,10 +4145,11 @@ namespace ClosedXML.Excel
                 QuotePrefix = OpenXmlHelper.GetBooleanValue(styleInfo.IncludeQuotePrefix, false)
             };
 
+            cellFormat.ApplyAlignment = true;
+
             if (addApply)
             {
                 cellFormat.ApplyNumberFormat = true;
-                cellFormat.ApplyAlignment = true;
                 cellFormat.ApplyFill = ApplyFill(styleInfo);
                 cellFormat.ApplyBorder = ApplyBorder(styleInfo);
                 cellFormat.ApplyProtection = ApplyProtection(styleInfo);

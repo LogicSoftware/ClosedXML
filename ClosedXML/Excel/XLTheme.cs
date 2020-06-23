@@ -29,8 +29,8 @@ namespace ClosedXML.Excel
             }
 
             Text1 = Func(themePart.Theme.ThemeElements.ColorScheme.Dark1Color);
-            Background1 = Func(themePart.Theme.ThemeElements.ColorScheme.Light1Color);
-            Text2 = Func(themePart.Theme.ThemeElements.ColorScheme.Light2Color);
+            Background1 = Func(themePart.Theme.ThemeElements.ColorScheme.Light2Color);
+            Text2 = Func(themePart.Theme.ThemeElements.ColorScheme.Light1Color);
             Background2 = Func(themePart.Theme.ThemeElements.ColorScheme.Dark2Color);
             Accent1 = Func(themePart.Theme.ThemeElements.ColorScheme.Accent1Color);
             Accent2 = Func(themePart.Theme.ThemeElements.ColorScheme.Accent2Color);

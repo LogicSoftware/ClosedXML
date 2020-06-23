@@ -282,9 +282,9 @@ namespace ClosedXML.Excel
             Theme = new XLTheme
             {
                 Text1 = XLColor.FromHtml("#FF000000"),
-                Background1 = XLColor.FromHtml("#FFFFFFFF"),
-                Text2 = XLColor.FromHtml("#FF1F497D"),
-                Background2 = XLColor.FromHtml("#FFEEECE1"),
+                Background1 = XLColor.FromHtml("#FFEEECE1"),
+                Text2 = XLColor.FromHtml("#FFFFFFFF"),
+                Background2 = XLColor.FromHtml("#FF1F497D"),
                 Accent1 = XLColor.FromHtml("#FF4F81BD"),
                 Accent2 = XLColor.FromHtml("#FFC0504D"),
                 Accent3 = XLColor.FromHtml("#FF9BBB59"),

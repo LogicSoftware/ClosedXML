@@ -1198,7 +1198,7 @@ namespace ClosedXML.Excel
             var systemColor2 = new SystemColor
             {
                 Val = SystemColorValues.Window,
-                LastColor = Theme.Background1.Color.ToHex().Substring(2)
+                LastColor = Theme.Text2.Color.ToHex().Substring(2)
             };
 
             light1Color1.AppendChild(systemColor2);
@@ -1209,7 +1209,7 @@ namespace ClosedXML.Excel
             dark2Color1.AppendChild(rgbColorModelHex1);
 
             var light2Color1 = new Light2Color();
-            var rgbColorModelHex2 = new RgbColorModelHex { Val = Theme.Text2.Color.ToHex().Substring(2) };
+            var rgbColorModelHex2 = new RgbColorModelHex { Val = Theme.Background1.Color.ToHex().Substring(2) };
 
             light2Color1.AppendChild(rgbColorModelHex2);
 

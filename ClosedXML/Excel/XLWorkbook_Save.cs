@@ -4010,7 +4010,7 @@ namespace ClosedXML.Excel
                     var namedStyle = styleList.FirstOrDefault(cs => cs.Name?.ToString() == styleInfo.Name);
 
                     if (namedStyle?.FormatId != null && styleFormatsList.Count > namedStyle.FormatId &&
-                        namedStyle.FormatId > 0)
+                        namedStyle.FormatId >= 0)
                     {
                         var cellStyleFormatIndex = Convert.ToInt32((uint) namedStyle.FormatId);
                         var cellStyleFormat = styleFormatsList[cellStyleFormatIndex];

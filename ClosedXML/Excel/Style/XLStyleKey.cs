@@ -46,7 +46,7 @@ namespace ClosedXML.Excel
                    IncludeQuotePrefix == other.IncludeQuotePrefix &&
                    NumberFormat == other.NumberFormat &&
                    Protection == other.Protection &&
-                   Name == other.Name;
+                   (Name ?? DefaultName) == (other.Name ?? DefaultName);
         }
 
         public override string ToString()

@@ -10,7 +10,7 @@ WORKDIR /$projname
 COPY $projname/$projname.csproj $projname/
 COPY $projname/$projname.nuspec $projname/
 
-RUN dotnet restore $projname/$projname.csproj -c Release.Signed
+RUN dotnet restore $projname/$projname.csproj
 
 COPY $projname $projname/
 

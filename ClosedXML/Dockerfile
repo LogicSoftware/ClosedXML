@@ -15,5 +15,6 @@ RUN dotnet restore $projname/$projname.csproj
 COPY $projname $projname/
 
 WORKDIR /$projname/$projname
+RUN dotnet build /p:Version=$packageversion -c Release.Signed
 RUN dotnet pack /p:Version=$packageversion -o packages -c Release.Signed
 RUN dotnet nuget push packages/$projname.$packageversion.nupkg -k $key -s $nugetserver

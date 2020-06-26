@@ -74,7 +74,7 @@ namespace ClosedXML_Tests.Excel.Misc
                 Assert.AreEqual("FF4F81BD", color);
 
                 color = wb.Theme.ResolveThemeColor(XLThemeColor.Background1).Color.ToHex();
-                Assert.AreEqual("FFFFFFFF", color);
+                Assert.AreEqual("FFEEECE1", color);
             }
         }
 

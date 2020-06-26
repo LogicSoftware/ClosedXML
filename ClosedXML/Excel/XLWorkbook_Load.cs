@@ -12,8 +12,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using ClosedXML.Excel.Style;
+using DocumentFormat.OpenXml.Math;
 using Ap = DocumentFormat.OpenXml.ExtendedProperties;
+using Break = DocumentFormat.OpenXml.Spreadsheet.Break;
 using Op = DocumentFormat.OpenXml.CustomProperties;
+using Run = DocumentFormat.OpenXml.Spreadsheet.Run;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 
@@ -899,11 +902,11 @@ namespace ClosedXML.Excel
             {
                 var cellStyleFormat = (CellFormat)stylesheet.CellStyleFormats.ElementAt(Convert.ToInt32((uint) cellStyle.FormatId));
 
-                GenerateStyleKey(cellStyleFormat, fills, borders, fonts, numberingFormats, out var styleKey);
+                GenerateStyleKey(cellStyleFormat, fills, borders, fonts, numberingFormats, cellStyle.Name, true, out var styleKey);
 
                 _namedStyles.Add(new XLNamedStyle(styleKey)
                 {
-                    Name =  cellStyle.Name,
+                    Name = cellStyle.Name,
                     BuiltIn = (cellStyle.BuiltinId != null ? (int?)Convert.ToInt32((uint)cellStyle.BuiltinId) : null)
                 });
             }
@@ -3081,15 +3084,17 @@ namespace ClosedXML.Excel
                 return true;
 
             var cellFormat = (CellFormat) s.CellFormats.ElementAt(styleIndex);
+            var name = s.CellStyles.Elements<CellStyle>()
+                .FirstOrDefault(cs => cs.FormatId != null && cellFormat.FormatId != null && (uint)cs.FormatId == (uint)cellFormat.FormatId && (cs.BuiltinId == null || cs.BuiltinId != 0))?.Name;
 
-            return GenerateStyleKey(cellFormat, fills, borders, fonts, numberingFormats, out xlStyle);
+            return GenerateStyleKey(cellFormat, fills, borders, fonts, numberingFormats, name, false, out xlStyle);
         }
 
         private bool GenerateStyleKey(CellFormat cellFormat, Fills fills, Borders borders, Fonts fonts,
-            NumberingFormats numberingFormats,
-            out XLStyleKey xlStyle)
+            NumberingFormats numberingFormats, string name, bool accontApply, out XLStyleKey xlStyle)
         {
             xlStyle = XLStyle.Default.Key;
+            xlStyle.Name = name;
 
             xlStyle.IncludeQuotePrefix = OpenXmlHelper.GetBooleanValueAsBool(cellFormat.QuotePrefix, false);
 
@@ -3111,7 +3116,7 @@ namespace ClosedXML.Excel
                 }
             }
 
-            if (UInt32HasValue(cellFormat.FillId))
+            if (UInt32HasValue(cellFormat.FillId) && (!accontApply || cellFormat.ApplyFill == null || cellFormat.ApplyFill))
             {
                 var fill = (Fill)fills.ElementAt((Int32)cellFormat.FillId.Value);
                 var xlFill = new XLFill(null);
@@ -3152,7 +3157,7 @@ namespace ClosedXML.Excel
                 xlStyle.Alignment = xlAlignment;
             }
 
-            if (UInt32HasValue(cellFormat.BorderId))
+            if (UInt32HasValue(cellFormat.BorderId) && (!accontApply || cellFormat.ApplyBorder == null || cellFormat.ApplyBorder))
             {
                 uint borderId = cellFormat.BorderId.Value;
                 var border = (Border)borders.ElementAt((Int32)borderId);
@@ -3209,7 +3214,7 @@ namespace ClosedXML.Excel
                 }
             }
 
-            if (UInt32HasValue(cellFormat.FontId))
+            if (UInt32HasValue(cellFormat.FontId) && (!accontApply || cellFormat.ApplyFont == null || cellFormat.ApplyFont))
             {
                 var fontId = cellFormat.FontId;
                 var font = (DocumentFormat.OpenXml.Spreadsheet.Font)fonts.ElementAt((Int32)fontId.Value);
@@ -3267,7 +3272,7 @@ namespace ClosedXML.Excel
                 }
             }
 
-            if (UInt32HasValue(cellFormat.NumberFormatId))
+            if (UInt32HasValue(cellFormat.NumberFormatId) && (!accontApply || cellFormat.ApplyNumberFormat == null || cellFormat.ApplyNumberFormat))
             {
                 var numberFormatId = cellFormat.NumberFormatId;
 

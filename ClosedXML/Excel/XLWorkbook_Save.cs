@@ -22,6 +22,8 @@ using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using ClosedXML.Excel.Style;
+using DocumentFormat.OpenXml.Math;
+using Alignment = DocumentFormat.OpenXml.Spreadsheet.Alignment;
 using Anchor = DocumentFormat.OpenXml.Vml.Spreadsheet.Anchor;
 using BackgroundColor = DocumentFormat.OpenXml.Spreadsheet.BackgroundColor;
 using BottomBorder = DocumentFormat.OpenXml.Spreadsheet.BottomBorder;
@@ -3667,7 +3669,8 @@ namespace ClosedXML.Excel
                     FillId = 0,
                     BorderId = 0,
                     IncludeQuotePrefix = false,
-                    NumberFormatId = 0
+                    NumberFormatId = 0,
+                    Name = defaultStyle.Name
                     //AlignmentId = 0
                 });
 
@@ -3774,7 +3777,8 @@ namespace ClosedXML.Excel
                     FillId = allSharedFills[styleValue.Fill].FillId,
                     BorderId = allSharedBorders[styleValue.Border].BorderId,
                     NumberFormatId = numberFormatId,
-                    IncludeQuotePrefix = ns.StyleKey.IncludeQuotePrefix
+                    IncludeQuotePrefix = ns.StyleKey.IncludeQuotePrefix,
+                    Name = styleValue.Name
                 };
             });
 
@@ -3794,7 +3798,8 @@ namespace ClosedXML.Excel
                             FillId = allSharedFills[xlStyle.Fill].FillId,
                             BorderId = allSharedBorders[xlStyle.Border].BorderId,
                             NumberFormatId = numberFormatId,
-                            IncludeQuotePrefix = xlStyle.IncludeQuotePrefix
+                            IncludeQuotePrefix = xlStyle.IncludeQuotePrefix,
+                            Name = xlStyle.Name
                         });
             }
 
@@ -3802,16 +3807,27 @@ namespace ClosedXML.Excel
             ResolveRest(workbookStylesPart, context);
             
             var newSharedStyles = new Dictionary<XLStyleValue, StyleInfo>();
+            var styleFormatsList = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().ToList();
+            var styleList = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().ToList();
             foreach (var ss in context.SharedStyles)
             {
                 var styleId = -1;
                 foreach (CellFormat f in workbookStylesPart.Stylesheet.CellFormats)
                 {
                     styleId++;
-                    if (CellFormatsAreEqual(f, ss.Value, compareAlignment: true, compareApply: false))
-                        break;
+
+                    if (ss.Key.Name != null)
+                    {
+                        if (CellFormatsForNamesAreEqual(f, ss.Value, styleFormatsList, styleList))
+                            break;
+                    }
+                    else
+                    {
+                        if (CellFormatsAreEqual(f, ss.Value, compareAlignment: true))
+                            break;
+                    }
                 }
-                if (styleId == -1)
+                if (styleId == -1 || styleId >= workbookStylesPart.Stylesheet.CellFormats.Count)
                     styleId = 0;
                 var si = ss.Value;
                 si.StyleId = (UInt32)styleId;
@@ -3981,20 +3997,44 @@ namespace ClosedXML.Excel
             if (workbookStylesPart.Stylesheet.CellFormats == null)
                 workbookStylesPart.Stylesheet.CellFormats = new CellFormats();
 
-            var cellStylesCount = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().Count();
+            var styleFormatsList = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().ToList();
+            var styleList = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().ToList();
+            var cellStylesCount = styleFormatsList.Count;
 
             foreach (var styleInfo in context.SharedStyles.Values)
             {
                 var info = styleInfo;
-                var foundOne =
-                    workbookStylesPart.Stylesheet.CellFormats.Cast<CellFormat>().Any(f => CellFormatsAreEqual(f, info, compareAlignment: true, compareApply: false));
 
-                var cellStyleFormatIndex = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().TakeWhile(cellFormat => !CellFormatsAreEqual(cellFormat, info, compareAlignment: false)).Count();
+                if (styleInfo.Name != null)
+                {
+                    var namedStyle = styleList.FirstOrDefault(cs => cs.Name?.ToString() == styleInfo.Name);
+
+                    if (namedStyle?.FormatId != null && styleFormatsList.Count > namedStyle.FormatId &&
+                        namedStyle.FormatId > 0)
+                    {
+                        var cellStyleFormatIndex = Convert.ToInt32((uint) namedStyle.FormatId);
+                        var cellStyleFormat = styleFormatsList[cellStyleFormatIndex];
+                        var foundOneNamed = workbookStylesPart.Stylesheet.CellFormats.Cast<CellFormat>().Any(f => CellFormatsForNamesAreEqual(f, info, styleFormatsList, styleList));
+
+                        if (!foundOneNamed)
+                        {
+                            var cellFormatNamed = GetCellFormatForNamed(styleInfo);
+                            cellFormatNamed.FormatId = (uint)cellStyleFormatIndex;
+
+                            workbookStylesPart.Stylesheet.CellFormats.AppendChild(cellFormatNamed);
+                        }
+                    }
+
+                    continue;
+                }
+
+                var foundOne =
+                    workbookStylesPart.Stylesheet.CellFormats.Cast<CellFormat>().Any(f => CellFormatsAreEqual(f, info, compareAlignment: true));
 
                 if (foundOne) continue;
 
-                var cellFormat = GetCellFormat(styleInfo, cellStyleFormatIndex == cellStylesCount);
-                cellFormat.FormatId = cellStyleFormatIndex == cellStylesCount ? 0 : (UInt32)cellStyleFormatIndex;
+                var cellFormat = GetCellFormat(styleInfo);
+                cellFormat.FormatId = 0;
                 var alignment = new Alignment
                 {
                     Horizontal = styleInfo.Style.Alignment.Horizontal.ToOpenXml(),
@@ -4015,6 +4055,7 @@ namespace ClosedXML.Excel
 
                 workbookStylesPart.Stylesheet.CellFormats.AppendChild(cellFormat);
             }
+
             workbookStylesPart.Stylesheet.CellFormats.Count = (UInt32)workbookStylesPart.Stylesheet.CellFormats.Count();
         }
 
@@ -4049,6 +4090,9 @@ namespace ClosedXML.Excel
 
             foreach (var styleInfo in context.SharedStyles.Values)
             {
+                if(styleInfo.Name != null && namedStyleInfos.ContainsKey(styleInfo.Name))
+                    continue;
+
                 var info = styleInfo;
                 var foundOne =
                     workbookStylesPart.Stylesheet.CellStyleFormats.Cast<CellFormat>().Any(
@@ -4075,19 +4119,39 @@ namespace ClosedXML.Excel
 
             var isCellStyleFormatAdded = false;
 
-            var cellStylesCount = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().Count();
-            var cellStyleFormatIndex = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>()
-                .TakeWhile(cellFormat => !CellFormatsAreEqual(cellFormat, info, compareAlignment: false)).Count();
+            var cellStylesFormatsList = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().ToList();
+            // var cellStyleFormatIndex = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>()
+            //      .TakeWhile(cellFormat => !CellFormatsAreEqual(cellFormat, info, compareAlignment: true)).Count();
 
-            var namedStyleExcel = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>()
+            int cellStyleFormatIndex = -1;
+
+              var namedStyleExcel = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>()
                 .FirstOrDefault(cellStyle => namedStyle.Name == cellStyle.Name);
 
-            if (cellStylesCount == cellStyleFormatIndex ||
+            if (namedStyleExcel != null)
+            {
+                cellStyleFormatIndex = Convert.ToInt32((uint)namedStyleExcel.FormatId);
+            }
+
+            if (cellStyleFormatIndex >= cellStylesFormatsList.Count || cellStyleFormatIndex < 0 || !CellFormatsAreEqual(cellStylesFormatsList[cellStyleFormatIndex], info, compareAlignment: true) ||
                 workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().Any(cellStyle => cellStyle != namedStyleExcel && cellStyle?.FormatId != null && cellStyle.FormatId == cellStyleFormatIndex))
             {
-                cellStyleFormatIndex = cellStylesCount;
+                cellStyleFormatIndex = cellStylesFormatsList.Count;
 
                 var cellStyleFormat = GetCellFormat(info);
+                var alignment = new Alignment
+                {
+                    Horizontal = info.Style.Alignment.Horizontal.ToOpenXml(),
+                    Vertical = info.Style.Alignment.Vertical.ToOpenXml(),
+                    Indent = (UInt32)info.Style.Alignment.Indent,
+                    ReadingOrder = (UInt32)info.Style.Alignment.ReadingOrder,
+                    WrapText = info.Style.Alignment.WrapText,
+                    TextRotation = (UInt32)info.Style.Alignment.TextRotation,
+                    ShrinkToFit = info.Style.Alignment.ShrinkToFit,
+                    RelativeIndent = info.Style.Alignment.RelativeIndent,
+                    JustifyLastLine = info.Style.Alignment.JustifyLastLine
+                };
+                cellStyleFormat.AppendChild(alignment);
 
                 if (cellStyleFormat.ApplyProtection.Value)
                     cellStyleFormat.AppendChild(GetProtection(info));
@@ -4096,7 +4160,7 @@ namespace ClosedXML.Excel
 
                 isCellStyleFormatAdded = true;
             }
-            
+
             if (namedStyleExcel == null)
             {
                 namedStyleExcel = new CellStyle()
@@ -4134,7 +4198,7 @@ namespace ClosedXML.Excel
             return styleInfo.Style.Protection != null;
         }
 
-        private static CellFormat GetCellFormat(StyleInfo styleInfo, bool addApply = true)
+        private static CellFormat GetCellFormat(StyleInfo styleInfo)
         {
             var cellFormat = new CellFormat
             {
@@ -4142,18 +4206,44 @@ namespace ClosedXML.Excel
                 FontId = styleInfo.FontId,
                 FillId = styleInfo.FillId,
                 BorderId = styleInfo.BorderId,
-                QuotePrefix = OpenXmlHelper.GetBooleanValue(styleInfo.IncludeQuotePrefix, false)
+                QuotePrefix = OpenXmlHelper.GetBooleanValue(styleInfo.IncludeQuotePrefix, false),
+                ApplyNumberFormat = true,
+                ApplyAlignment = true,
+                ApplyFill = ApplyFill(styleInfo),
+                ApplyBorder = ApplyBorder(styleInfo),
+                ApplyProtection = ApplyProtection(styleInfo)
+            };
+            return cellFormat;
+        }
+
+        private static CellFormat GetCellFormatForNamed(StyleInfo styleInfo)
+        {
+            var cellFormat = new CellFormat
+            {
+                NumberFormatId = (UInt32)styleInfo.NumberFormatId,
+                FontId = styleInfo.FontId,
+                FillId = styleInfo.FillId,
+                BorderId = styleInfo.BorderId,
+                QuotePrefix = OpenXmlHelper.GetBooleanValue(styleInfo.IncludeQuotePrefix, false),
             };
 
-            cellFormat.ApplyAlignment = true;
-
-            if (addApply)
+            var alignment = new Alignment
             {
-                cellFormat.ApplyNumberFormat = true;
-                cellFormat.ApplyFill = ApplyFill(styleInfo);
-                cellFormat.ApplyBorder = ApplyBorder(styleInfo);
-                cellFormat.ApplyProtection = ApplyProtection(styleInfo);
-            }
+                Horizontal = styleInfo.Style.Alignment.Horizontal.ToOpenXml(),
+                Vertical = styleInfo.Style.Alignment.Vertical.ToOpenXml(),
+                Indent = (UInt32)styleInfo.Style.Alignment.Indent,
+                ReadingOrder = (UInt32)styleInfo.Style.Alignment.ReadingOrder,
+                WrapText = styleInfo.Style.Alignment.WrapText,
+                TextRotation = (UInt32)styleInfo.Style.Alignment.TextRotation,
+                ShrinkToFit = styleInfo.Style.Alignment.ShrinkToFit,
+                RelativeIndent = styleInfo.Style.Alignment.RelativeIndent,
+                JustifyLastLine = styleInfo.Style.Alignment.JustifyLastLine
+            };
+
+            cellFormat.AppendChild(alignment);
+
+            if (styleInfo.Style.Protection != null)
+                cellFormat.AppendChild(GetProtection(styleInfo));
 
             return cellFormat;
         }
@@ -4192,6 +4282,17 @@ namespace ClosedXML.Excel
                                               f.ApplyBorder != null && f.ApplyBorder == ApplyBorder(styleInfo))
                 && (!compareAlignment || AlignmentsAreEqual(f.Alignment, styleInfo.Style.Alignment))
                 && ProtectionsAreEqual(f.Protection, styleInfo.Style.Protection);
+        }
+
+        private static bool CellFormatsForNamesAreEqual(CellFormat f, StyleInfo styleInfo, List<CellFormat> styleFormatList, List<CellStyle> styleList)
+        {
+            if(!CellFormatsAreEqual(f, styleInfo, true, false))
+                return false;
+
+            if (f.FormatId == null || f.FormatId < 0 || f.FormatId >= styleFormatList.Count)
+                return false;
+
+            return styleList.Any(sc => sc.Name == styleInfo.Name && (uint)f.FormatId == (uint)sc.FormatId);
         }
 
         private static bool ProtectionsAreEqual(Protection protection, XLProtectionValue xlProtection)

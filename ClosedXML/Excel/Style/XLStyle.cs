@@ -23,7 +23,8 @@ namespace ClosedXML.Excel
                 Border = XLBorder.GenerateKey(initialStyle.Border),
                 Fill = XLFill.GenerateKey(initialStyle.Fill),
                 NumberFormat = XLNumberFormat.GenerateKey(initialStyle.NumberFormat),
-                Protection = XLProtection.GenerateKey(initialStyle.Protection)
+                Protection = XLProtection.GenerateKey(initialStyle.Protection),
+                Name = initialStyle.Name
             };
         }
 
@@ -141,6 +142,15 @@ namespace ClosedXML.Excel
             return this;
         }
 
+        public string Name
+        {
+            get => Value.Name;
+            set
+            {
+                Modify(k => { k.Name = value; return k; });
+            }
+        }
+
         public IXLNumberFormat NumberFormat
         {
             get { return new XLNumberFormat(this, Value.NumberFormat); }
@@ -183,6 +193,8 @@ namespace ClosedXML.Excel
             sb.Append(Alignment);
             sb.Append(" Protection: ");
             sb.Append(Protection);
+            sb.Append(" Name: ");
+            sb.Append(Name ?? string.Empty);
             return sb.ToString();
         }
 

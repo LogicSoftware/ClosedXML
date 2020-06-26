@@ -16,4 +16,4 @@ COPY $projname $projname/
 
 WORKDIR /$projname/$projname
 RUN dotnet pack /p:Version=$packageversion -o packages
-RUN dotnet nuget push packages/LogicSoftware.$projname.$packageversion.nupkg -k $key -s $nugetserver
+RUN dotnet nuget push packages/$projname.$packageversion.nupkg -k $key -s $nugetserver

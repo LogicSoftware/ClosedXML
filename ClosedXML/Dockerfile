@@ -10,10 +10,10 @@ WORKDIR /$projname
 COPY $projname/$projname.csproj $projname/
 COPY $projname/$projname.nuspec $projname/
 
-RUN dotnet restore $projname/$projname.csproj
+RUN dotnet restore $projname/$projname.csproj -c Release.Signed
 
 COPY $projname $projname/
 
 WORKDIR /$projname/$projname
-RUN dotnet pack /p:Version=$packageversion -o packages
+RUN dotnet pack /p:Version=$packageversion -o packages -c Release.Signed
 RUN dotnet nuget push packages/$projname.$packageversion.nupkg -k $key -s $nugetserver

@@ -116,6 +116,12 @@ namespace ClosedXML.Excel
             return new XLWorkbook(path, asTemplate: true);
         }
 
+
+        public static XLWorkbook OpenFromTemplate(Stream stream)
+        {
+            return new XLWorkbook(stream, asTemplate: true);
+        }
+
         #endregion Static
 
         internal readonly List<UnsupportedSheet> UnsupportedSheets =
@@ -686,6 +692,12 @@ namespace ClosedXML.Excel
             : this(XLEventTracking.Enabled)
         {
             LoadSheetsFromTemplate(file);
+        }
+
+        internal XLWorkbook(Stream stream, Boolean asTemplate)
+            : this(XLEventTracking.Enabled)
+        {
+            LoadSheetsFromTemplate(stream);
         }
 
         public XLWorkbook(XLEventTracking eventTracking)

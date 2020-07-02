@@ -66,6 +66,17 @@ namespace ClosedXML.Excel
             ResetAllRelIds();
         }
 
+        private void LoadSheetsFromTemplate(Stream stream)
+        {
+            using (var dSpreadsheet = SpreadsheetDocument.Open(stream, false))
+            {
+                SpreadsheetDocument spreadsheetDocumentNew = (SpreadsheetDocument)dSpreadsheet.Clone();
+                LoadSpreadsheetDocument(spreadsheetDocumentNew);
+            }
+
+            ResetAllRelIds();
+        }
+
         private void ResetAllRelIds()
         {
             foreach (var ws in Worksheets.Cast<XLWorksheet>())

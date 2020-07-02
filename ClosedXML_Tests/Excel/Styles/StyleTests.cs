@@ -87,8 +87,8 @@ namespace ClosedXML_Tests.Excel
             using (var stream = TestHelper.GetStreamFromResource(TestHelper.GetResourcePath(@"Other\StyleReferenceFiles\Named\Book2.xlsx")))
                 TestHelper.CreateAndCompare(() =>
                 {
-                  //  var wb = XLWorkbook.OpenFromTemplate("C:\\new temp\\Book2.xlsx");
-                    var wb = new XLWorkbook(stream);
+                   // var wb = XLWorkbook.OpenFromTemplate("C:\\new temp\\Book2.xlsx");
+                    var wb = XLWorkbook.OpenFromTemplate(stream); //new XLWorkbook(stream);
                     var ws = wb.Worksheets.Add("Style Font");
 
                     var co = 2;

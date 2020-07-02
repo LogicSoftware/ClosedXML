@@ -306,7 +306,7 @@ namespace ClosedXML.Excel
             FontScheme = new XLFontScheme(fontScheme);
         }
 
-        public IXLStyle FromName(IXLCell container,  string name)
+        public IXLStyle FromName<T>(T container,  string name)
         {
             var key = _namedStyles?.FirstOrDefault(ns => ns.Name == name);
 

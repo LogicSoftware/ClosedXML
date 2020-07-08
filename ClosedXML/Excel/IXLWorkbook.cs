@@ -249,5 +249,7 @@ namespace ClosedXML.Excel
         IXLWorksheet Worksheet(Int32 position);
 
         IXLStyle FromName<T>(T container, string name);
+
+        IXLStyle FromName(string name);
     }
 }

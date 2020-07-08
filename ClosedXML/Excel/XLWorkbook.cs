@@ -319,6 +319,13 @@ namespace ClosedXML.Excel
             return key == null || !(container is IXLStylized) ? null : new XLStyle((IXLStylized) container, key.StyleKey);
         }
 
+        public IXLStyle FromName(string name)
+        {
+            var key = _namedStyles?.FirstOrDefault(ns => ns.Name == name);
+
+            return key == null  ? null : new XLStyle(null, key.StyleKey);
+        }
+
         public IXLNamedRange NamedRange(String rangeName)
         {
             if (rangeName.Contains("!"))

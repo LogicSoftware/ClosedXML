@@ -145,6 +145,7 @@ namespace ClosedXML.Excel
             public Int32 NumberFormatId;
             public XLStyleValue Style;
             public UInt32 StyleId;
+            public string Name;
         }
 
         #endregion Nested type: StyleInfo

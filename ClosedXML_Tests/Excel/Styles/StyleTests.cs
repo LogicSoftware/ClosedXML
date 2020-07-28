@@ -81,6 +81,27 @@ namespace ClosedXML_Tests.Excel
             }
         }
 
+        [Test]
+        public void NamedStyleTests()
+        {
+            using (var stream = TestHelper.GetStreamFromResource(TestHelper.GetResourcePath(@"Other\StyleReferenceFiles\Named\Book2.xlsx")))
+                TestHelper.CreateAndCompare(() =>
+                {
+                   // var wb = XLWorkbook.OpenFromTemplate("C:\\new temp\\Book2.xlsx");
+                    var wb = XLWorkbook.OpenFromTemplate(stream); //new XLWorkbook(stream);
+                    var ws = wb.Worksheets.Add("Style Font");
+
+                    var co = 2;
+                    var ro = 1;
+
+                    ws.Cell(++ro, co).Value = "Bold";
+                    ws.Cell(ro, co).Style = wb.FromName(ws.Cell(ro, co), "Bad");
+
+                    var ws2 = wb.Worksheets.Add("New sheet");
+                    return wb;
+                }, @"Other\StyleReferenceFiles\Named\output.xlsx");
+        }
+
         private static IEnumerable<TestCaseData> StylizedEntities
         {
             get

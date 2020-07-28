@@ -39,6 +39,8 @@ namespace ClosedXML.Excel
 
         public XLProtectionValue Protection { get; private set; }
 
+        public string Name { get; set; }
+
         internal XLStyleValue(XLStyleKey key)
         {
             Key = key;
@@ -49,6 +51,7 @@ namespace ClosedXML.Excel
             IncludeQuotePrefix = key.IncludeQuotePrefix;
             NumberFormat = XLNumberFormatValue.FromKey(Key.NumberFormat);
             Protection = XLProtectionValue.FromKey(Key.Protection);
+            Name = key.Name;
         }
 
         public override bool Equals(object obj)

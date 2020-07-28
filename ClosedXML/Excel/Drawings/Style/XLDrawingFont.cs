@@ -1,4 +1,5 @@
 using System;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ClosedXML.Excel
 {
@@ -27,6 +28,7 @@ namespace ClosedXML.Excel
         public XLFontFamilyNumberingValues FontFamilyNumbering { get; set; }
 
         public XLFontCharSet FontCharSet { get; set; }
+        public FontSchemeValues FontSchemeVal { get; set; }
 
         public IXLDrawingStyle SetBold()
         {

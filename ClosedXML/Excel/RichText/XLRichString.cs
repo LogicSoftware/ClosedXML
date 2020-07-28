@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ClosedXML.Excel
 {
@@ -38,6 +39,7 @@ namespace ClosedXML.Excel
         public String FontName { get; set; }
         public XLFontFamilyNumberingValues FontFamilyNumbering { get; set; }
         public XLFontCharSet FontCharSet { get; set; }
+        public FontSchemeValues FontSchemeVal { get; set; }
 
         public IXLRichString SetBold()
         {

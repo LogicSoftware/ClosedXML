@@ -1,4 +1,6 @@
 using System;
+using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace ClosedXML.Excel
 {
@@ -25,5 +27,7 @@ namespace ClosedXML.Excel
         XLFontFamilyNumberingValues FontFamilyNumbering { get; set; }
 
         XLFontCharSet FontCharSet { get; set; }
+
+        FontSchemeValues FontSchemeVal { get; set; }
     }
 }

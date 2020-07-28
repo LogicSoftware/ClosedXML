@@ -7,6 +7,9 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Packaging;
+using Path = System.IO.Path;
 
 namespace ClosedXML.Excel
 {
@@ -113,6 +116,12 @@ namespace ClosedXML.Excel
             return new XLWorkbook(path, asTemplate: true);
         }
 
+
+        public static XLWorkbook OpenFromTemplate(Stream stream)
+        {
+            return new XLWorkbook(stream, asTemplate: true);
+        }
+
         #endregion Static
 
         internal readonly List<UnsupportedSheet> UnsupportedSheets =
@@ -165,6 +174,11 @@ namespace ClosedXML.Excel
         ///   Gets an object to manipulate this workbook's theme.
         /// </summary>
         public IXLTheme Theme { get; private set; }
+
+        /// <summary>
+        ///   Gets an object to manipulate this workbook's theme.
+        /// </summary>
+        public XLFontScheme FontScheme { get; private set; }
 
         /// <summary>
         ///   Gets or sets the default style for the workbook.
@@ -274,9 +288,9 @@ namespace ClosedXML.Excel
             Theme = new XLTheme
             {
                 Text1 = XLColor.FromHtml("#FF000000"),
-                Background1 = XLColor.FromHtml("#FFFFFFFF"),
-                Text2 = XLColor.FromHtml("#FF1F497D"),
-                Background2 = XLColor.FromHtml("#FFEEECE1"),
+                Background1 = XLColor.FromHtml("#FFEEECE1"),
+                Text2 = XLColor.FromHtml("#FFFFFFFF"),
+                Background2 = XLColor.FromHtml("#FF1F497D"),
                 Accent1 = XLColor.FromHtml("#FF4F81BD"),
                 Accent2 = XLColor.FromHtml("#FFC0504D"),
                 Accent3 = XLColor.FromHtml("#FF9BBB59"),
@@ -286,6 +300,30 @@ namespace ClosedXML.Excel
                 Hyperlink = XLColor.FromHtml("#FF0000FF"),
                 FollowedHyperlink = XLColor.FromHtml("#FF800080")
             };
+        }
+        
+        private void InitializeThemeFromThemePart(ThemePart themePart)
+        {
+            Theme = new XLTheme(themePart);
+        }
+
+        private void InitializeFontSchemeFromFontPart(FontScheme fontScheme)
+        {
+            FontScheme = new XLFontScheme(fontScheme);
+        }
+
+        public IXLStyle FromName<T>(T container,  string name)
+        {
+            var key = _namedStyles?.FirstOrDefault(ns => ns.Name == name);
+
+            return key == null || !(container is IXLStylized) ? null : new XLStyle((IXLStylized) container, key.StyleKey);
+        }
+
+        public IXLStyle FromName(string name)
+        {
+            var key = _namedStyles?.FirstOrDefault(ns => ns.Name == name);
+
+            return key == null  ? null : new XLStyle(null, key.StyleKey);
         }
 
         public IXLNamedRange NamedRange(String rangeName)
@@ -661,6 +699,12 @@ namespace ClosedXML.Excel
             : this(XLEventTracking.Enabled)
         {
             LoadSheetsFromTemplate(file);
+        }
+
+        internal XLWorkbook(Stream stream, Boolean asTemplate)
+            : this(XLEventTracking.Enabled)
+        {
+            LoadSheetsFromTemplate(stream);
         }
 
         public XLWorkbook(XLEventTracking eventTracking)

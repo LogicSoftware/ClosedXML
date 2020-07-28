@@ -21,6 +21,9 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
+using ClosedXML.Excel.Style;
+using DocumentFormat.OpenXml.Math;
+using Alignment = DocumentFormat.OpenXml.Spreadsheet.Alignment;
 using Anchor = DocumentFormat.OpenXml.Vml.Spreadsheet.Anchor;
 using BackgroundColor = DocumentFormat.OpenXml.Spreadsheet.BackgroundColor;
 using BottomBorder = DocumentFormat.OpenXml.Spreadsheet.BottomBorder;
@@ -1197,18 +1200,18 @@ namespace ClosedXML.Excel
             var systemColor2 = new SystemColor
             {
                 Val = SystemColorValues.Window,
-                LastColor = Theme.Background1.Color.ToHex().Substring(2)
+                LastColor = Theme.Text2.Color.ToHex().Substring(2)
             };
 
             light1Color1.AppendChild(systemColor2);
 
             var dark2Color1 = new Dark2Color();
-            var rgbColorModelHex1 = new RgbColorModelHex { Val = Theme.Text2.Color.ToHex().Substring(2) };
+            var rgbColorModelHex1 = new RgbColorModelHex { Val = Theme.Background2.Color.ToHex().Substring(2) };
 
             dark2Color1.AppendChild(rgbColorModelHex1);
 
             var light2Color1 = new Light2Color();
-            var rgbColorModelHex2 = new RgbColorModelHex { Val = Theme.Background2.Color.ToHex().Substring(2) };
+            var rgbColorModelHex2 = new RgbColorModelHex { Val = Theme.Background1.Color.ToHex().Substring(2) };
 
             light2Color1.AppendChild(rgbColorModelHex2);
 
@@ -1265,144 +1268,153 @@ namespace ClosedXML.Excel
             colorScheme1.AppendChild(hyperlink1);
             colorScheme1.AppendChild(followedHyperlinkColor1);
 
-            var fontScheme2 = new FontScheme { Name = "Office" };
+            FontScheme fontScheme2;
 
-            var majorFont1 = new MajorFont();
-            var latinFont1 = new LatinFont { Typeface = "Cambria" };
-            var eastAsianFont1 = new EastAsianFont { Typeface = "" };
-            var complexScriptFont1 = new ComplexScriptFont { Typeface = "" };
-            var supplementalFont1 = new SupplementalFont { Script = "Jpan", Typeface = "ＭＳ Ｐゴシック" };
-            var supplementalFont2 = new SupplementalFont { Script = "Hang", Typeface = "맑은 고딕" };
-            var supplementalFont3 = new SupplementalFont { Script = "Hans", Typeface = "宋体" };
-            var supplementalFont4 = new SupplementalFont { Script = "Hant", Typeface = "新細明體" };
-            var supplementalFont5 = new SupplementalFont { Script = "Arab", Typeface = "Times New Roman" };
-            var supplementalFont6 = new SupplementalFont { Script = "Hebr", Typeface = "Times New Roman" };
-            var supplementalFont7 = new SupplementalFont { Script = "Thai", Typeface = "Tahoma" };
-            var supplementalFont8 = new SupplementalFont { Script = "Ethi", Typeface = "Nyala" };
-            var supplementalFont9 = new SupplementalFont { Script = "Beng", Typeface = "Vrinda" };
-            var supplementalFont10 = new SupplementalFont { Script = "Gujr", Typeface = "Shruti" };
-            var supplementalFont11 = new SupplementalFont { Script = "Khmr", Typeface = "MoolBoran" };
-            var supplementalFont12 = new SupplementalFont { Script = "Knda", Typeface = "Tunga" };
-            var supplementalFont13 = new SupplementalFont { Script = "Guru", Typeface = "Raavi" };
-            var supplementalFont14 = new SupplementalFont { Script = "Cans", Typeface = "Euphemia" };
-            var supplementalFont15 = new SupplementalFont { Script = "Cher", Typeface = "Plantagenet Cherokee" };
-            var supplementalFont16 = new SupplementalFont { Script = "Yiii", Typeface = "Microsoft Yi Baiti" };
-            var supplementalFont17 = new SupplementalFont { Script = "Tibt", Typeface = "Microsoft Himalaya" };
-            var supplementalFont18 = new SupplementalFont { Script = "Thaa", Typeface = "MV Boli" };
-            var supplementalFont19 = new SupplementalFont { Script = "Deva", Typeface = "Mangal" };
-            var supplementalFont20 = new SupplementalFont { Script = "Telu", Typeface = "Gautami" };
-            var supplementalFont21 = new SupplementalFont { Script = "Taml", Typeface = "Latha" };
-            var supplementalFont22 = new SupplementalFont { Script = "Syrc", Typeface = "Estrangelo Edessa" };
-            var supplementalFont23 = new SupplementalFont { Script = "Orya", Typeface = "Kalinga" };
-            var supplementalFont24 = new SupplementalFont { Script = "Mlym", Typeface = "Kartika" };
-            var supplementalFont25 = new SupplementalFont { Script = "Laoo", Typeface = "DokChampa" };
-            var supplementalFont26 = new SupplementalFont { Script = "Sinh", Typeface = "Iskoola Pota" };
-            var supplementalFont27 = new SupplementalFont { Script = "Mong", Typeface = "Mongolian Baiti" };
-            var supplementalFont28 = new SupplementalFont { Script = "Viet", Typeface = "Times New Roman" };
-            var supplementalFont29 = new SupplementalFont { Script = "Uigh", Typeface = "Microsoft Uighur" };
+            if (FontScheme != null && !FontScheme.IsEmpty())
+            {
+                fontScheme2 = FontScheme.ToExcelFontScheme();
+            }
+            else
+            {
+                fontScheme2 = new FontScheme { Name = "Office" };
 
-            majorFont1.AppendChild(latinFont1);
-            majorFont1.AppendChild(eastAsianFont1);
-            majorFont1.AppendChild(complexScriptFont1);
-            majorFont1.AppendChild(supplementalFont1);
-            majorFont1.AppendChild(supplementalFont2);
-            majorFont1.AppendChild(supplementalFont3);
-            majorFont1.AppendChild(supplementalFont4);
-            majorFont1.AppendChild(supplementalFont5);
-            majorFont1.AppendChild(supplementalFont6);
-            majorFont1.AppendChild(supplementalFont7);
-            majorFont1.AppendChild(supplementalFont8);
-            majorFont1.AppendChild(supplementalFont9);
-            majorFont1.AppendChild(supplementalFont10);
-            majorFont1.AppendChild(supplementalFont11);
-            majorFont1.AppendChild(supplementalFont12);
-            majorFont1.AppendChild(supplementalFont13);
-            majorFont1.AppendChild(supplementalFont14);
-            majorFont1.AppendChild(supplementalFont15);
-            majorFont1.AppendChild(supplementalFont16);
-            majorFont1.AppendChild(supplementalFont17);
-            majorFont1.AppendChild(supplementalFont18);
-            majorFont1.AppendChild(supplementalFont19);
-            majorFont1.AppendChild(supplementalFont20);
-            majorFont1.AppendChild(supplementalFont21);
-            majorFont1.AppendChild(supplementalFont22);
-            majorFont1.AppendChild(supplementalFont23);
-            majorFont1.AppendChild(supplementalFont24);
-            majorFont1.AppendChild(supplementalFont25);
-            majorFont1.AppendChild(supplementalFont26);
-            majorFont1.AppendChild(supplementalFont27);
-            majorFont1.AppendChild(supplementalFont28);
-            majorFont1.AppendChild(supplementalFont29);
+                var majorFont1 = new MajorFont();
+                var latinFont1 = new LatinFont { Typeface = "Cambria" };
+                var eastAsianFont1 = new EastAsianFont { Typeface = "" };
+                var complexScriptFont1 = new ComplexScriptFont { Typeface = "" };
+                var supplementalFont1 = new SupplementalFont { Script = "Jpan", Typeface = "ＭＳ Ｐゴシック" };
+                var supplementalFont2 = new SupplementalFont { Script = "Hang", Typeface = "맑은 고딕" };
+                var supplementalFont3 = new SupplementalFont { Script = "Hans", Typeface = "宋体" };
+                var supplementalFont4 = new SupplementalFont { Script = "Hant", Typeface = "新細明體" };
+                var supplementalFont5 = new SupplementalFont { Script = "Arab", Typeface = "Times New Roman" };
+                var supplementalFont6 = new SupplementalFont { Script = "Hebr", Typeface = "Times New Roman" };
+                var supplementalFont7 = new SupplementalFont { Script = "Thai", Typeface = "Tahoma" };
+                var supplementalFont8 = new SupplementalFont { Script = "Ethi", Typeface = "Nyala" };
+                var supplementalFont9 = new SupplementalFont { Script = "Beng", Typeface = "Vrinda" };
+                var supplementalFont10 = new SupplementalFont { Script = "Gujr", Typeface = "Shruti" };
+                var supplementalFont11 = new SupplementalFont { Script = "Khmr", Typeface = "MoolBoran" };
+                var supplementalFont12 = new SupplementalFont { Script = "Knda", Typeface = "Tunga" };
+                var supplementalFont13 = new SupplementalFont { Script = "Guru", Typeface = "Raavi" };
+                var supplementalFont14 = new SupplementalFont { Script = "Cans", Typeface = "Euphemia" };
+                var supplementalFont15 = new SupplementalFont { Script = "Cher", Typeface = "Plantagenet Cherokee" };
+                var supplementalFont16 = new SupplementalFont { Script = "Yiii", Typeface = "Microsoft Yi Baiti" };
+                var supplementalFont17 = new SupplementalFont { Script = "Tibt", Typeface = "Microsoft Himalaya" };
+                var supplementalFont18 = new SupplementalFont { Script = "Thaa", Typeface = "MV Boli" };
+                var supplementalFont19 = new SupplementalFont { Script = "Deva", Typeface = "Mangal" };
+                var supplementalFont20 = new SupplementalFont { Script = "Telu", Typeface = "Gautami" };
+                var supplementalFont21 = new SupplementalFont { Script = "Taml", Typeface = "Latha" };
+                var supplementalFont22 = new SupplementalFont { Script = "Syrc", Typeface = "Estrangelo Edessa" };
+                var supplementalFont23 = new SupplementalFont { Script = "Orya", Typeface = "Kalinga" };
+                var supplementalFont24 = new SupplementalFont { Script = "Mlym", Typeface = "Kartika" };
+                var supplementalFont25 = new SupplementalFont { Script = "Laoo", Typeface = "DokChampa" };
+                var supplementalFont26 = new SupplementalFont { Script = "Sinh", Typeface = "Iskoola Pota" };
+                var supplementalFont27 = new SupplementalFont { Script = "Mong", Typeface = "Mongolian Baiti" };
+                var supplementalFont28 = new SupplementalFont { Script = "Viet", Typeface = "Times New Roman" };
+                var supplementalFont29 = new SupplementalFont { Script = "Uigh", Typeface = "Microsoft Uighur" };
 
-            var minorFont1 = new MinorFont();
-            var latinFont2 = new LatinFont { Typeface = "Calibri" };
-            var eastAsianFont2 = new EastAsianFont { Typeface = "" };
-            var complexScriptFont2 = new ComplexScriptFont { Typeface = "" };
-            var supplementalFont30 = new SupplementalFont { Script = "Jpan", Typeface = "ＭＳ Ｐゴシック" };
-            var supplementalFont31 = new SupplementalFont { Script = "Hang", Typeface = "맑은 고딕" };
-            var supplementalFont32 = new SupplementalFont { Script = "Hans", Typeface = "宋体" };
-            var supplementalFont33 = new SupplementalFont { Script = "Hant", Typeface = "新細明體" };
-            var supplementalFont34 = new SupplementalFont { Script = "Arab", Typeface = "Arial" };
-            var supplementalFont35 = new SupplementalFont { Script = "Hebr", Typeface = "Arial" };
-            var supplementalFont36 = new SupplementalFont { Script = "Thai", Typeface = "Tahoma" };
-            var supplementalFont37 = new SupplementalFont { Script = "Ethi", Typeface = "Nyala" };
-            var supplementalFont38 = new SupplementalFont { Script = "Beng", Typeface = "Vrinda" };
-            var supplementalFont39 = new SupplementalFont { Script = "Gujr", Typeface = "Shruti" };
-            var supplementalFont40 = new SupplementalFont { Script = "Khmr", Typeface = "DaunPenh" };
-            var supplementalFont41 = new SupplementalFont { Script = "Knda", Typeface = "Tunga" };
-            var supplementalFont42 = new SupplementalFont { Script = "Guru", Typeface = "Raavi" };
-            var supplementalFont43 = new SupplementalFont { Script = "Cans", Typeface = "Euphemia" };
-            var supplementalFont44 = new SupplementalFont { Script = "Cher", Typeface = "Plantagenet Cherokee" };
-            var supplementalFont45 = new SupplementalFont { Script = "Yiii", Typeface = "Microsoft Yi Baiti" };
-            var supplementalFont46 = new SupplementalFont { Script = "Tibt", Typeface = "Microsoft Himalaya" };
-            var supplementalFont47 = new SupplementalFont { Script = "Thaa", Typeface = "MV Boli" };
-            var supplementalFont48 = new SupplementalFont { Script = "Deva", Typeface = "Mangal" };
-            var supplementalFont49 = new SupplementalFont { Script = "Telu", Typeface = "Gautami" };
-            var supplementalFont50 = new SupplementalFont { Script = "Taml", Typeface = "Latha" };
-            var supplementalFont51 = new SupplementalFont { Script = "Syrc", Typeface = "Estrangelo Edessa" };
-            var supplementalFont52 = new SupplementalFont { Script = "Orya", Typeface = "Kalinga" };
-            var supplementalFont53 = new SupplementalFont { Script = "Mlym", Typeface = "Kartika" };
-            var supplementalFont54 = new SupplementalFont { Script = "Laoo", Typeface = "DokChampa" };
-            var supplementalFont55 = new SupplementalFont { Script = "Sinh", Typeface = "Iskoola Pota" };
-            var supplementalFont56 = new SupplementalFont { Script = "Mong", Typeface = "Mongolian Baiti" };
-            var supplementalFont57 = new SupplementalFont { Script = "Viet", Typeface = "Arial" };
-            var supplementalFont58 = new SupplementalFont { Script = "Uigh", Typeface = "Microsoft Uighur" };
+                majorFont1.AppendChild(latinFont1);
+                majorFont1.AppendChild(eastAsianFont1);
+                majorFont1.AppendChild(complexScriptFont1);
+                majorFont1.AppendChild(supplementalFont1);
+                majorFont1.AppendChild(supplementalFont2);
+                majorFont1.AppendChild(supplementalFont3);
+                majorFont1.AppendChild(supplementalFont4);
+                majorFont1.AppendChild(supplementalFont5);
+                majorFont1.AppendChild(supplementalFont6);
+                majorFont1.AppendChild(supplementalFont7);
+                majorFont1.AppendChild(supplementalFont8);
+                majorFont1.AppendChild(supplementalFont9);
+                majorFont1.AppendChild(supplementalFont10);
+                majorFont1.AppendChild(supplementalFont11);
+                majorFont1.AppendChild(supplementalFont12);
+                majorFont1.AppendChild(supplementalFont13);
+                majorFont1.AppendChild(supplementalFont14);
+                majorFont1.AppendChild(supplementalFont15);
+                majorFont1.AppendChild(supplementalFont16);
+                majorFont1.AppendChild(supplementalFont17);
+                majorFont1.AppendChild(supplementalFont18);
+                majorFont1.AppendChild(supplementalFont19);
+                majorFont1.AppendChild(supplementalFont20);
+                majorFont1.AppendChild(supplementalFont21);
+                majorFont1.AppendChild(supplementalFont22);
+                majorFont1.AppendChild(supplementalFont23);
+                majorFont1.AppendChild(supplementalFont24);
+                majorFont1.AppendChild(supplementalFont25);
+                majorFont1.AppendChild(supplementalFont26);
+                majorFont1.AppendChild(supplementalFont27);
+                majorFont1.AppendChild(supplementalFont28);
+                majorFont1.AppendChild(supplementalFont29);
 
-            minorFont1.AppendChild(latinFont2);
-            minorFont1.AppendChild(eastAsianFont2);
-            minorFont1.AppendChild(complexScriptFont2);
-            minorFont1.AppendChild(supplementalFont30);
-            minorFont1.AppendChild(supplementalFont31);
-            minorFont1.AppendChild(supplementalFont32);
-            minorFont1.AppendChild(supplementalFont33);
-            minorFont1.AppendChild(supplementalFont34);
-            minorFont1.AppendChild(supplementalFont35);
-            minorFont1.AppendChild(supplementalFont36);
-            minorFont1.AppendChild(supplementalFont37);
-            minorFont1.AppendChild(supplementalFont38);
-            minorFont1.AppendChild(supplementalFont39);
-            minorFont1.AppendChild(supplementalFont40);
-            minorFont1.AppendChild(supplementalFont41);
-            minorFont1.AppendChild(supplementalFont42);
-            minorFont1.AppendChild(supplementalFont43);
-            minorFont1.AppendChild(supplementalFont44);
-            minorFont1.AppendChild(supplementalFont45);
-            minorFont1.AppendChild(supplementalFont46);
-            minorFont1.AppendChild(supplementalFont47);
-            minorFont1.AppendChild(supplementalFont48);
-            minorFont1.AppendChild(supplementalFont49);
-            minorFont1.AppendChild(supplementalFont50);
-            minorFont1.AppendChild(supplementalFont51);
-            minorFont1.AppendChild(supplementalFont52);
-            minorFont1.AppendChild(supplementalFont53);
-            minorFont1.AppendChild(supplementalFont54);
-            minorFont1.AppendChild(supplementalFont55);
-            minorFont1.AppendChild(supplementalFont56);
-            minorFont1.AppendChild(supplementalFont57);
-            minorFont1.AppendChild(supplementalFont58);
+                var minorFont1 = new MinorFont();
+                var latinFont2 = new LatinFont { Typeface = "Calibri" };
+                var eastAsianFont2 = new EastAsianFont { Typeface = "" };
+                var complexScriptFont2 = new ComplexScriptFont { Typeface = "" };
+                var supplementalFont30 = new SupplementalFont { Script = "Jpan", Typeface = "ＭＳ Ｐゴシック" };
+                var supplementalFont31 = new SupplementalFont { Script = "Hang", Typeface = "맑은 고딕" };
+                var supplementalFont32 = new SupplementalFont { Script = "Hans", Typeface = "宋体" };
+                var supplementalFont33 = new SupplementalFont { Script = "Hant", Typeface = "新細明體" };
+                var supplementalFont34 = new SupplementalFont { Script = "Arab", Typeface = "Arial" };
+                var supplementalFont35 = new SupplementalFont { Script = "Hebr", Typeface = "Arial" };
+                var supplementalFont36 = new SupplementalFont { Script = "Thai", Typeface = "Tahoma" };
+                var supplementalFont37 = new SupplementalFont { Script = "Ethi", Typeface = "Nyala" };
+                var supplementalFont38 = new SupplementalFont { Script = "Beng", Typeface = "Vrinda" };
+                var supplementalFont39 = new SupplementalFont { Script = "Gujr", Typeface = "Shruti" };
+                var supplementalFont40 = new SupplementalFont { Script = "Khmr", Typeface = "DaunPenh" };
+                var supplementalFont41 = new SupplementalFont { Script = "Knda", Typeface = "Tunga" };
+                var supplementalFont42 = new SupplementalFont { Script = "Guru", Typeface = "Raavi" };
+                var supplementalFont43 = new SupplementalFont { Script = "Cans", Typeface = "Euphemia" };
+                var supplementalFont44 = new SupplementalFont { Script = "Cher", Typeface = "Plantagenet Cherokee" };
+                var supplementalFont45 = new SupplementalFont { Script = "Yiii", Typeface = "Microsoft Yi Baiti" };
+                var supplementalFont46 = new SupplementalFont { Script = "Tibt", Typeface = "Microsoft Himalaya" };
+                var supplementalFont47 = new SupplementalFont { Script = "Thaa", Typeface = "MV Boli" };
+                var supplementalFont48 = new SupplementalFont { Script = "Deva", Typeface = "Mangal" };
+                var supplementalFont49 = new SupplementalFont { Script = "Telu", Typeface = "Gautami" };
+                var supplementalFont50 = new SupplementalFont { Script = "Taml", Typeface = "Latha" };
+                var supplementalFont51 = new SupplementalFont { Script = "Syrc", Typeface = "Estrangelo Edessa" };
+                var supplementalFont52 = new SupplementalFont { Script = "Orya", Typeface = "Kalinga" };
+                var supplementalFont53 = new SupplementalFont { Script = "Mlym", Typeface = "Kartika" };
+                var supplementalFont54 = new SupplementalFont { Script = "Laoo", Typeface = "DokChampa" };
+                var supplementalFont55 = new SupplementalFont { Script = "Sinh", Typeface = "Iskoola Pota" };
+                var supplementalFont56 = new SupplementalFont { Script = "Mong", Typeface = "Mongolian Baiti" };
+                var supplementalFont57 = new SupplementalFont { Script = "Viet", Typeface = "Arial" };
+                var supplementalFont58 = new SupplementalFont { Script = "Uigh", Typeface = "Microsoft Uighur" };
 
-            fontScheme2.AppendChild(majorFont1);
-            fontScheme2.AppendChild(minorFont1);
+                minorFont1.AppendChild(latinFont2);
+                minorFont1.AppendChild(eastAsianFont2);
+                minorFont1.AppendChild(complexScriptFont2);
+                minorFont1.AppendChild(supplementalFont30);
+                minorFont1.AppendChild(supplementalFont31);
+                minorFont1.AppendChild(supplementalFont32);
+                minorFont1.AppendChild(supplementalFont33);
+                minorFont1.AppendChild(supplementalFont34);
+                minorFont1.AppendChild(supplementalFont35);
+                minorFont1.AppendChild(supplementalFont36);
+                minorFont1.AppendChild(supplementalFont37);
+                minorFont1.AppendChild(supplementalFont38);
+                minorFont1.AppendChild(supplementalFont39);
+                minorFont1.AppendChild(supplementalFont40);
+                minorFont1.AppendChild(supplementalFont41);
+                minorFont1.AppendChild(supplementalFont42);
+                minorFont1.AppendChild(supplementalFont43);
+                minorFont1.AppendChild(supplementalFont44);
+                minorFont1.AppendChild(supplementalFont45);
+                minorFont1.AppendChild(supplementalFont46);
+                minorFont1.AppendChild(supplementalFont47);
+                minorFont1.AppendChild(supplementalFont48);
+                minorFont1.AppendChild(supplementalFont49);
+                minorFont1.AppendChild(supplementalFont50);
+                minorFont1.AppendChild(supplementalFont51);
+                minorFont1.AppendChild(supplementalFont52);
+                minorFont1.AppendChild(supplementalFont53);
+                minorFont1.AppendChild(supplementalFont54);
+                minorFont1.AppendChild(supplementalFont55);
+                minorFont1.AppendChild(supplementalFont56);
+                minorFont1.AppendChild(supplementalFont57);
+                minorFont1.AppendChild(supplementalFont58);
+
+                fontScheme2.AppendChild(majorFont1);
+                fontScheme2.AppendChild(minorFont1);
+            }
 
             var formatScheme1 = new FormatScheme { Name = "Office" };
 
@@ -3605,7 +3617,21 @@ namespace ClosedXML.Excel
 
         private void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart, SaveContext context)
         {
-            var defaultStyle = DefaultStyleValue;
+            var xlStyles = new HashSet<XLStyleValue>();
+            XLStyleValue defaultStyle = null;
+
+            foreach (var namedStyle in _namedStyles)
+            {
+                var styleKey = namedStyle.StyleKey;
+                var styleValue = XLStyleValue.FromKey(styleKey);
+                xlStyles.Add(styleValue);
+                namedStyle.StyleKey = styleKey;
+
+                if (namedStyle.BuiltIn == 0)
+                    defaultStyle = styleValue;
+            }
+
+            defaultStyle ??= DefaultStyleValue;
 
             if (!context.SharedFonts.ContainsKey(defaultStyle.Font))
                 context.SharedFonts.Add(defaultStyle.Font, new FontInfo { FontId = 0, Font = defaultStyle.Font });
@@ -3643,7 +3669,8 @@ namespace ClosedXML.Excel
                     FillId = 0,
                     BorderId = 0,
                     IncludeQuotePrefix = false,
-                    NumberFormatId = 0
+                    NumberFormatId = 0,
+                    Name = defaultStyle.Name
                     //AlignmentId = 0
                 });
 
@@ -3653,7 +3680,7 @@ namespace ClosedXML.Excel
             UInt32 borderCount = 1;
             var numberFormatCount = 0; // 0-based
             var pivotTableNumberFormats = new HashSet<IXLPivotValueFormat>();
-            var xlStyles = new HashSet<XLStyleValue>();
+           // var xlStyles = new HashSet<XLStyleValue>();
 
             foreach (var worksheet in WorksheetsInternal)
             {
@@ -3734,6 +3761,27 @@ namespace ClosedXML.Excel
             var allSharedFills = ResolveFills(workbookStylesPart, sharedFills);
             var allSharedBorders = ResolveBorders(workbookStylesPart, sharedBorders);
 
+            Dictionary<string, StyleInfo> namedStyleInfos = _namedStyles?.ToDictionary(ns => ns.Name, ns =>
+            {
+                var styleKey = ns.StyleKey;
+                var styleValue = XLStyleValue.FromKey(styleKey);
+
+                var numberFormatId = styleValue.NumberFormat.NumberFormatId >= 0
+                    ? styleValue.NumberFormat.NumberFormatId
+                    : allSharedNumberFormats[styleValue.NumberFormat].NumberFormatId;
+                return new StyleInfo
+                {
+                    StyleId = styleCount++,
+                    Style = styleValue,
+                    FontId = context.SharedFonts[styleValue.Font].FontId,
+                    FillId = allSharedFills[styleValue.Fill].FillId,
+                    BorderId = allSharedBorders[styleValue.Border].BorderId,
+                    NumberFormatId = numberFormatId,
+                    IncludeQuotePrefix = ns.StyleKey.IncludeQuotePrefix,
+                    Name = styleValue.Name
+                };
+            });
+
             foreach (var xlStyle in xlStyles)
             {
                 var numberFormatId = xlStyle.NumberFormat.NumberFormatId >= 0
@@ -3750,29 +3798,36 @@ namespace ClosedXML.Excel
                             FillId = allSharedFills[xlStyle.Fill].FillId,
                             BorderId = allSharedBorders[xlStyle.Border].BorderId,
                             NumberFormatId = numberFormatId,
-                            IncludeQuotePrefix = xlStyle.IncludeQuotePrefix
+                            IncludeQuotePrefix = xlStyle.IncludeQuotePrefix,
+                            Name = xlStyle.Name
                         });
             }
 
-            ResolveCellStyleFormats(workbookStylesPart, context);
+            ResolveCellStyleFormats(workbookStylesPart, context, namedStyleInfos, defaultFormatId);
             ResolveRest(workbookStylesPart, context);
-
-            if (!workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().Any(c => c.BuiltinId != null && c.BuiltinId.HasValue && c.BuiltinId.Value == 0U))
-                workbookStylesPart.Stylesheet.CellStyles.AppendChild(new CellStyle { Name = "Normal", FormatId = defaultFormatId, BuiltinId = 0U });
-
-            workbookStylesPart.Stylesheet.CellStyles.Count = (UInt32)workbookStylesPart.Stylesheet.CellStyles.Count();
-
+            
             var newSharedStyles = new Dictionary<XLStyleValue, StyleInfo>();
+            var styleFormatsList = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().ToList();
+            var styleList = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().ToList();
             foreach (var ss in context.SharedStyles)
             {
                 var styleId = -1;
                 foreach (CellFormat f in workbookStylesPart.Stylesheet.CellFormats)
                 {
                     styleId++;
-                    if (CellFormatsAreEqual(f, ss.Value, compareAlignment: true))
-                        break;
+
+                    if (ss.Key.Name != null)
+                    {
+                        if (CellFormatsForNamesAreEqual(f, ss.Value, styleFormatsList, styleList))
+                            break;
+                    }
+                    else
+                    {
+                        if (CellFormatsAreEqual(f, ss.Value, compareAlignment: true))
+                            break;
+                    }
                 }
-                if (styleId == -1)
+                if (styleId == -1 || styleId >= workbookStylesPart.Stylesheet.CellFormats.Count)
                     styleId = 0;
                 var si = ss.Value;
                 si.StyleId = (UInt32)styleId;
@@ -3780,7 +3835,7 @@ namespace ClosedXML.Excel
             }
             context.SharedStyles.Clear();
             newSharedStyles.ForEach(kp => context.SharedStyles.Add(kp.Key, kp.Value));
-
+            
             AddDifferentialFormats(workbookStylesPart, context);
         }
 
@@ -3942,9 +3997,37 @@ namespace ClosedXML.Excel
             if (workbookStylesPart.Stylesheet.CellFormats == null)
                 workbookStylesPart.Stylesheet.CellFormats = new CellFormats();
 
+            var styleFormatsList = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().ToList();
+            var styleList = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().ToList();
+            var cellStylesCount = styleFormatsList.Count;
+
             foreach (var styleInfo in context.SharedStyles.Values)
             {
                 var info = styleInfo;
+
+                if (styleInfo.Name != null)
+                {
+                    var namedStyle = styleList.FirstOrDefault(cs => cs.Name?.ToString() == styleInfo.Name);
+
+                    if (namedStyle?.FormatId != null && styleFormatsList.Count > namedStyle.FormatId &&
+                        namedStyle.FormatId >= 0)
+                    {
+                        var cellStyleFormatIndex = Convert.ToInt32((uint) namedStyle.FormatId);
+                        var cellStyleFormat = styleFormatsList[cellStyleFormatIndex];
+                        var foundOneNamed = workbookStylesPart.Stylesheet.CellFormats.Cast<CellFormat>().Any(f => CellFormatsForNamesAreEqual(f, info, styleFormatsList, styleList));
+
+                        if (!foundOneNamed)
+                        {
+                            var cellFormatNamed = GetCellFormatForNamed(styleInfo);
+                            cellFormatNamed.FormatId = (uint)cellStyleFormatIndex;
+
+                            workbookStylesPart.Stylesheet.CellFormats.AppendChild(cellFormatNamed);
+                        }
+                    }
+
+                    continue;
+                }
+
                 var foundOne =
                     workbookStylesPart.Stylesheet.CellFormats.Cast<CellFormat>().Any(f => CellFormatsAreEqual(f, info, compareAlignment: true));
 
@@ -3964,24 +4047,52 @@ namespace ClosedXML.Excel
                     RelativeIndent = styleInfo.Style.Alignment.RelativeIndent,
                     JustifyLastLine = styleInfo.Style.Alignment.JustifyLastLine
                 };
+
                 cellFormat.AppendChild(alignment);
 
-                if (cellFormat.ApplyProtection.Value)
+                if (cellFormat.ApplyProtection?.Value ?? false)
                     cellFormat.AppendChild(GetProtection(styleInfo));
 
                 workbookStylesPart.Stylesheet.CellFormats.AppendChild(cellFormat);
             }
+
             workbookStylesPart.Stylesheet.CellFormats.Count = (UInt32)workbookStylesPart.Stylesheet.CellFormats.Count();
         }
 
-        private static void ResolveCellStyleFormats(WorkbookStylesPart workbookStylesPart,
-            SaveContext context)
+        private void ResolveCellStyleFormats(WorkbookStylesPart workbookStylesPart, SaveContext context, Dictionary<string, StyleInfo> namedStyleInfos, uint defaultFormatId)
         {
             if (workbookStylesPart.Stylesheet.CellStyleFormats == null)
                 workbookStylesPart.Stylesheet.CellStyleFormats = new CellStyleFormats();
 
+            if (workbookStylesPart.Stylesheet.CellStyles == null)
+                workbookStylesPart.Stylesheet.CellStyles = new CellStyles();
+
+            if (!workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().Any(c => c.BuiltinId != null && c.BuiltinId.HasValue && c.BuiltinId.Value == 0U))
+            {
+                var normalStyle = _namedStyles.FirstOrDefault(ns => ns.BuiltIn == 0);
+                if (normalStyle != null)
+                {
+                    AddNamedCellStyleAndFormat(workbookStylesPart, namedStyleInfos, normalStyle/*, defaultFormatId*/);
+                }
+                else
+                    workbookStylesPart.Stylesheet.CellStyles.AppendChild(new CellStyle { Name = "Normal", FormatId = defaultFormatId, BuiltinId = 0U });
+            }
+
+            if (_namedStyles?.Any() ?? false)
+            {
+                 foreach (var namedStyle in this._namedStyles.Where(ns => ns.BuiltIn != 0))
+                 {
+                    AddNamedCellStyleAndFormat(workbookStylesPart, namedStyleInfos, namedStyle);
+                 }
+            }
+
+            workbookStylesPart.Stylesheet.CellStyles.Count = (UInt32)workbookStylesPart.Stylesheet.CellStyles.Count();
+
             foreach (var styleInfo in context.SharedStyles.Values)
             {
+                if(styleInfo.Name != null && namedStyleInfos.ContainsKey(styleInfo.Name))
+                    continue;
+
                 var info = styleInfo;
                 var foundOne =
                     workbookStylesPart.Stylesheet.CellStyleFormats.Cast<CellFormat>().Any(
@@ -3996,13 +4107,80 @@ namespace ClosedXML.Excel
 
                 workbookStylesPart.Stylesheet.CellStyleFormats.AppendChild(cellStyleFormat);
             }
+
             workbookStylesPart.Stylesheet.CellStyleFormats.Count =
                 (UInt32)workbookStylesPart.Stylesheet.CellStyleFormats.Count();
         }
 
+        private static bool AddNamedCellStyleAndFormat(WorkbookStylesPart workbookStylesPart, Dictionary<string, StyleInfo> namedStyleInfos,
+            XLNamedStyle namedStyle)
+        {
+            var info = namedStyleInfos[namedStyle.Name];
+
+            var isCellStyleFormatAdded = false;
+
+            var cellStylesFormatsList = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>().ToList();
+            // var cellStyleFormatIndex = workbookStylesPart.Stylesheet.CellStyleFormats.Elements<CellFormat>()
+            //      .TakeWhile(cellFormat => !CellFormatsAreEqual(cellFormat, info, compareAlignment: true)).Count();
+
+            int cellStyleFormatIndex = -1;
+
+              var namedStyleExcel = workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>()
+                .FirstOrDefault(cellStyle => namedStyle.Name == cellStyle.Name);
+
+            if (namedStyleExcel != null)
+            {
+                cellStyleFormatIndex = Convert.ToInt32((uint)namedStyleExcel.FormatId);
+            }
+
+            if (cellStyleFormatIndex >= cellStylesFormatsList.Count || cellStyleFormatIndex < 0 || !CellFormatsAreEqual(cellStylesFormatsList[cellStyleFormatIndex], info, compareAlignment: true) ||
+                workbookStylesPart.Stylesheet.CellStyles.Elements<CellStyle>().Any(cellStyle => cellStyle != namedStyleExcel && cellStyle?.FormatId != null && cellStyle.FormatId == cellStyleFormatIndex))
+            {
+                cellStyleFormatIndex = cellStylesFormatsList.Count;
+
+                var cellStyleFormat = GetCellFormat(info);
+                var alignment = new Alignment
+                {
+                    Horizontal = info.Style.Alignment.Horizontal.ToOpenXml(),
+                    Vertical = info.Style.Alignment.Vertical.ToOpenXml(),
+                    Indent = (UInt32)info.Style.Alignment.Indent,
+                    ReadingOrder = (UInt32)info.Style.Alignment.ReadingOrder,
+                    WrapText = info.Style.Alignment.WrapText,
+                    TextRotation = (UInt32)info.Style.Alignment.TextRotation,
+                    ShrinkToFit = info.Style.Alignment.ShrinkToFit,
+                    RelativeIndent = info.Style.Alignment.RelativeIndent,
+                    JustifyLastLine = info.Style.Alignment.JustifyLastLine
+                };
+                cellStyleFormat.AppendChild(alignment);
+
+                if (cellStyleFormat.ApplyProtection.Value)
+                    cellStyleFormat.AppendChild(GetProtection(info));
+
+                workbookStylesPart.Stylesheet.CellStyleFormats.AppendChild(cellStyleFormat);
+
+                isCellStyleFormatAdded = true;
+            }
+
+            if (namedStyleExcel == null)
+            {
+                namedStyleExcel = new CellStyle()
+                {
+                    Name = namedStyle.Name
+                };
+
+                if (namedStyle.BuiltIn != null)
+                    namedStyleExcel.BuiltinId = (UInt32) namedStyle.BuiltIn;
+
+                workbookStylesPart.Stylesheet.CellStyles.AppendChild(namedStyleExcel);
+            }
+
+            namedStyleExcel.FormatId = (UInt32)cellStyleFormatIndex;
+            return isCellStyleFormatAdded;
+        }
+
         private static bool ApplyFill(StyleInfo styleInfo)
         {
-            return styleInfo.Style.Fill.PatternType.ToOpenXml() == PatternValues.None;
+            return styleInfo.Style.Fill.PatternType.ToOpenXml() != PatternValues.None;
         }
 
         private static bool ApplyBorder(StyleInfo styleInfo)
@@ -4038,6 +4216,38 @@ namespace ClosedXML.Excel
             return cellFormat;
         }
 
+        private static CellFormat GetCellFormatForNamed(StyleInfo styleInfo)
+        {
+            var cellFormat = new CellFormat
+            {
+                NumberFormatId = (UInt32)styleInfo.NumberFormatId,
+                FontId = styleInfo.FontId,
+                FillId = styleInfo.FillId,
+                BorderId = styleInfo.BorderId,
+                QuotePrefix = OpenXmlHelper.GetBooleanValue(styleInfo.IncludeQuotePrefix, false),
+            };
+
+            var alignment = new Alignment
+            {
+                Horizontal = styleInfo.Style.Alignment.Horizontal.ToOpenXml(),
+                Vertical = styleInfo.Style.Alignment.Vertical.ToOpenXml(),
+                Indent = (UInt32)styleInfo.Style.Alignment.Indent,
+                ReadingOrder = (UInt32)styleInfo.Style.Alignment.ReadingOrder,
+                WrapText = styleInfo.Style.Alignment.WrapText,
+                TextRotation = (UInt32)styleInfo.Style.Alignment.TextRotation,
+                ShrinkToFit = styleInfo.Style.Alignment.ShrinkToFit,
+                RelativeIndent = styleInfo.Style.Alignment.RelativeIndent,
+                JustifyLastLine = styleInfo.Style.Alignment.JustifyLastLine
+            };
+
+            cellFormat.AppendChild(alignment);
+
+            if (styleInfo.Style.Protection != null)
+                cellFormat.AppendChild(GetProtection(styleInfo));
+
+            return cellFormat;
+        }
+
         private static Protection GetProtection(StyleInfo styleInfo)
         {
             return new Protection
@@ -4056,8 +4266,9 @@ namespace ClosedXML.Excel
         /// Styles in x:cellStyleXfs section do not include alignment so we don't have to compare it in this case.
         /// Styles in x:cellXfs section, on the opposite, do include alignments, and we must compare them.
         /// </param>
+        /// <param name="compareApply"></param>
         /// <returns>True if two formats are equivalent, false otherwise.</returns>
-        private static bool CellFormatsAreEqual(CellFormat f, StyleInfo styleInfo, bool compareAlignment)
+        private static bool CellFormatsAreEqual(CellFormat f, StyleInfo styleInfo, bool compareAlignment, bool compareApply = true)
         {
             return
                 f.BorderId != null && styleInfo.BorderId == f.BorderId
@@ -4065,13 +4276,23 @@ namespace ClosedXML.Excel
                 && f.FontId != null && styleInfo.FontId == f.FontId
                 && f.NumberFormatId != null && styleInfo.NumberFormatId == f.NumberFormatId
                 && QuotePrefixesAreEqual(f.QuotePrefix, styleInfo.IncludeQuotePrefix)
-                && (f.ApplyFill == null && styleInfo.Style.Fill == XLFillValue.Default ||
-                    f.ApplyFill != null && f.ApplyFill == ApplyFill(styleInfo))
-                && (f.ApplyBorder == null && styleInfo.Style.Border == XLBorderValue.Default ||
-                    f.ApplyBorder != null && f.ApplyBorder == ApplyBorder(styleInfo))
+                && ((f.ApplyFill == null && (!compareApply || styleInfo.Style.Fill == XLFillValue.Default ))||
+                                    (f.ApplyFill != null && f.ApplyFill == ApplyFill(styleInfo)))
+                && (f.ApplyBorder == null && (!compareApply || styleInfo.Style.Border == XLBorderValue.Default) ||
+                                              f.ApplyBorder != null && f.ApplyBorder == ApplyBorder(styleInfo))
                 && (!compareAlignment || AlignmentsAreEqual(f.Alignment, styleInfo.Style.Alignment))
-                && ProtectionsAreEqual(f.Protection, styleInfo.Style.Protection)
-                ;
+                && ProtectionsAreEqual(f.Protection, styleInfo.Style.Protection);
+        }
+
+        private static bool CellFormatsForNamesAreEqual(CellFormat f, StyleInfo styleInfo, List<CellFormat> styleFormatList, List<CellStyle> styleList)
+        {
+            if(!CellFormatsAreEqual(f, styleInfo, true, false))
+                return false;
+
+            if (f.FormatId == null || f.FormatId < 0 || f.FormatId >= styleFormatList.Count)
+                return false;
+
+            return styleList.Any(sc => sc.Name == styleInfo.Name && (uint)f.FormatId == (uint)sc.FormatId);
         }
 
         private static bool ProtectionsAreEqual(Protection protection, XLProtectionValue xlProtection)
@@ -4479,6 +4700,9 @@ namespace ClosedXML.Excel
             if (fontCharSet != null)
                 font.AppendChild(fontCharSet);
 
+            if(fontInfo.Font.FontSchemeVal != FontSchemeValues.None)
+                font.FontScheme = new DocumentFormat.OpenXml.Spreadsheet.FontScheme() { Val = fontInfo.Font.FontSchemeVal };
+
             return font;
         }
 
@@ -4510,6 +4734,8 @@ namespace ClosedXML.Excel
                 nf.FontName = f.FontName.Val;
             if (f.FontFamilyNumbering != null)
                 nf.FontFamilyNumbering = (XLFontFamilyNumberingValues)f.FontFamilyNumbering.Val.Value;
+            if (f.FontScheme != null)
+                nf.FontSchemeVal = f.FontScheme.Val;
 
             return nf.Equals(xlFont.Key);
         }

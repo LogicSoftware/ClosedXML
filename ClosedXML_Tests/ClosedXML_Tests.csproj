@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net40;net46</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>7.2</LangVersion>
     <Version>0.95.2</Version>
     <IsPackable>false</IsPackable>
@@ -62,6 +62,10 @@
   <ItemGroup>
     <ProjectReference Include="..\ClosedXML\ClosedXML.csproj" />
     <ProjectReference Include="..\ClosedXML_Examples\ClosedXML_Examples.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Resource\Other\StyleReferenceFiles\Named\" />
   </ItemGroup>
 
 </Project>

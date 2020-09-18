@@ -2258,7 +2258,7 @@ namespace ClosedXML.Excel
 
             // When number format starts with @, we treat any value as text - no parsing required
             // This doesn't happen in the SetValue<T>() version
-            if (style.NumberFormat.Format == "@")
+            if (style.NumberFormat.Format == "@" || style.NumberFormat.NumberFormatId == (int)XLPredefinedFormat.Number.Text)
             {
                 parsedValue = value.ObjectToInvariantString();
 

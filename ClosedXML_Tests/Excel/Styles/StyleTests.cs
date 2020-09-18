@@ -84,11 +84,10 @@ namespace ClosedXML_Tests.Excel
         [Test]
         public void NamedStyleTests()
         {
-            using (var stream = TestHelper.GetStreamFromResource(TestHelper.GetResourcePath(@"Other\StyleReferenceFiles\Named\Book2.xlsx")))
+            using (var stream = TestHelper.GetStreamFromResource(TestHelper.GetResourcePath(@"Other\StyleReferenceFiles\Named\Book.xlsx")))
                 TestHelper.CreateAndCompare(() =>
                 {
-                   // var wb = XLWorkbook.OpenFromTemplate("C:\\new temp\\Book2.xlsx");
-                    var wb = XLWorkbook.OpenFromTemplate(stream); //new XLWorkbook(stream);
+                    var wb = XLWorkbook.OpenFromTemplate(stream); 
                     var ws = wb.Worksheets.Add("Style Font");
 
                     var co = 2;
@@ -102,6 +101,27 @@ namespace ClosedXML_Tests.Excel
                 }, @"Other\StyleReferenceFiles\Named\output.xlsx");
         }
 
+        [Test]
+        public void Cell_values_with_text_numberformatid_should_not_be_modified()
+        {
+            using (var stream = TestHelper.GetStreamFromResource(TestHelper.GetResourcePath(@"Other\StyleReferenceFiles\Named\Book.xlsx")))
+            {
+                using (var wb = XLWorkbook.OpenFromTemplate(stream))
+                {
+                    var ws = wb.Worksheets.Add("2");
+
+                    var co = 2;
+                    var ro = 1;
+
+                    ws.Column(co).Style = wb.FromName(ws.Column(co), "String");
+                    ws.Cell(ro, co).Value = " 11";
+
+                    Assert.AreEqual(" 11", ws.Cell(ro, co).Value, "Value should not change");
+                    Assert.AreEqual(XLDataType.Text, ws.Cell(ro, co).DataType, "Cell datatype should be text");
+                    Assert.AreEqual("String", ws.Cell(ro, co).Style.Name, "Cell style should be equal to column style");
+                }
+            };
+        }
         private static IEnumerable<TestCaseData> StylizedEntities
         {
             get

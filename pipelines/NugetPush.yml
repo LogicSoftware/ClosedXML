@@ -1,0 +1,41 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - ClosedXML/*
+
+pr: none
+
+parameters:
+- name: PackagePostfix
+  type: string
+  default: ' '
+
+variables:
+- template: /Deployment.Azure/Templates/MicroServices.Var.Common.yml@OPS
+- name:  'ServiceName'
+  value: 'ClosedXML'
+- name: 'ClientFolder'
+  value: 'ClosedXML'
+
+resources:
+  repositories:
+  - repository: OPS
+    type: git
+    name: EasyProjects/OPS
+    ref: refs/heads/master
+
+pool:
+  vmImage: $(vmImageName)
+
+stages:
+- template: /Deployment.Azure/Templates/Microservices.NugetPush.yml@OPS
+  parameters:
+    buildContext: ''
+    BuildNumber: 1.0.$(Build.BuildId)
+    DockerfilePath: ${{ variables.ClientFolder}}/Dockerfile
+    NugetKey: ${{ variables.NugetKey }}
+    PackagePostfix: ${{ parameters.PackagePostfix }}
+    ServiceName: ${{ variables.ServiceName }}
